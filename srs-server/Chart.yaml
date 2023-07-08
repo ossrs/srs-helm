@@ -1,0 +1,26 @@
+apiVersion: v2
+name: srs-server
+appVersion: "5.0.157"
+version: 1.0.0
+description: SRS is a simple, high-efficiency, real-time video server
+  supporting RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
+home: https://helm.ossrs.io/stable
+icon: https://ossrs.io/lts/en-us/img/srs-220x234.png
+keywords:
+  - srs
+  - media
+  - video
+  - rtmp
+  - hls
+  - webrtc
+  - srt
+sources:
+  - https://github.com/ossrs/srs-helm/tree/v1.0.0/srs-server
+maintainers:
+  - name: Winlin
+    email: winlinvip@gmail.com
+    url: https://github.com/ossrs/srs-helm
+type: application
+annotations:
+  category: Infrastructure
+  licenses: MIT
