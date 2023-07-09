@@ -22,7 +22,7 @@ fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -45,6 +45,7 @@ securityContext: {}
 service:
   type: LoadBalancer
   rtmp: 1935
+  http: 8080
 
 ingress:
   enabled: false

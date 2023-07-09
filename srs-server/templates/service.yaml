@@ -11,5 +11,9 @@ spec:
       port: {{ .Values.service.rtmp }}
       targetPort: 1935
       protocol: TCP
+    - name: http
+      port: {{ .Values.service.http }}
+      targetPort: 8080
+      protocol: TCP
   selector:
     {{- include "srs.selectorLabels" . | nindent 4 }}

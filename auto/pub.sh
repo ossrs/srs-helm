@@ -41,7 +41,7 @@ REPO_VERSION="1.0.$REPO_NEXT"
 echo "repo: Last is $REPO_RELEASE $REPO_REVISION, release as NEXT:$REPO_NEXT TAG:$REPO_TAG VERION:$REPO_VERSION"
 
 SRS_SERVER_PREFIX=srs-server
-SRS_SERVER_RELEASE=$(git describe --tags --abbrev=0 --match ${SRS_SERVER_PREFIX}-* 2>/dev/null || echo "${SRS_SERVER_PREFIX}-v1.0.-1")
+SRS_SERVER_RELEASE=$(git describe --tags --abbrev=0 --match ${SRS_SERVER_PREFIX}-v* 2>/dev/null || echo "${SRS_SERVER_PREFIX}-v1.0.-1")
 SRS_SERVER_REVISION=$(echo $SRS_SERVER_RELEASE|awk -F . '{print $3}')
 let SRS_SERVER_NEXT=$SRS_SERVER_REVISION+1
 if [[ $refresh == true && $SRS_SERVER_REVISION != "-1" ]]; then
@@ -66,19 +66,20 @@ if [[ ! -f $CHARTS_HOME/$SRS_SERVER_PREFIX-$SRS_SERVER_VERSION.tgz ]]; then
   exit 1
 fi
 
-git st |grep -q 'nothing to commit'
+git status |grep -q 'nothing to commit'
 if [[ $? -ne 0 ]]; then
   echo "Failed: Please commit before release";
   exit 1
 fi
 
 if [[ $no_sync == false ]]; then
-  git pull && git push
-  if [[ $? -ne 0 ]]; then
-    echo "Failed: Please sync before release: git pull && git push";
+  git fetch origin
+  if [[ $(git status |grep -q 'Your branch is up to date' || echo 'no') == no ]]; then
+    git status
+    echo "Failed: Please sync before release";
     exit 1
   fi
-  echo "Sync OK: git pull && git push"
+  echo "Sync OK"
 fi
 
 git tag -d $REPO_TAG 2>/dev/null; git push origin :$REPO_TAG 2>/dev/null

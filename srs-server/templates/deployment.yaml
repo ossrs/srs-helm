@@ -38,7 +38,7 @@ spec:
               containerPort: {{ .Values.service.rtmp }}
               protocol: TCP
             - name: http
-              containerPort: 8080
+              containerPort: {{ .Values.service.http }}
               protocol: TCP
           livenessProbe:
             httpGet:

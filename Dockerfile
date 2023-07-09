@@ -44,5 +44,5 @@ FROM nginx:stable as dist
 
 COPY --from=docs    /g/_site      /usr/share/nginx/html
 COPY --from=stable  /g/stable     /usr/share/nginx/html/stable
-COPY --from=stable  /g/stable     /usr/share/nginx/html/srs-server
+COPY --from=stable  /g/srs-server     /usr/share/nginx/html/srs-server
 ADD conf /etc/nginx

@@ -16,6 +16,11 @@
           "type": "string"
         }
       }
+    },
+    "replicaCount": {
+      "type": "integer",
+      "const": 1,
+      "description": "Warning: Only support 1 replica right now."
     }
   }
 }
