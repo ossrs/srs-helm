@@ -4,9 +4,9 @@ WORKDIR /g
 # Copy all docs files to /g.
 ADD README.md /g/index.markdown
 # Copy Jekyll files to /g.
-ADD Gemfile /g/Gemfile
-ADD Gemfile.lock /g/Gemfile.lock
-ADD _config.yml /g/_config.yml
+ADD jekyll/Gemfile /g/Gemfile
+ADD jekyll/Gemfile.lock /g/Gemfile.lock
+ADD jekyll/_config.yml /g/_config.yml
 
 RUN gem install jekyll bundler
 

@@ -16,6 +16,19 @@ image:
 
 replicaCount: 1
 
+# The configuration for SRS can be overridden by environment variables.
+conf:
+  SRS_LOG_TANK: "console"
+  SRS_HTTP_SERVER_ENABLED: "on"
+  SRS_VHOST_HTTP_REMUX_ENABLED: "on"
+  SRS_VHOST_HLS_ENABLED: "on"
+  SRS_HTTP_API_ENABLED: "on"
+
+# The environment variables to set in the container.
+env: []
+  #- name: SRS_LOG_TANK
+  #  value: "file"
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -46,6 +59,7 @@ service:
   type: LoadBalancer
   rtmp: 1935
   http: 8080
+  api: 1985
 
 ingress:
   enabled: false

@@ -1,7 +1,7 @@
 
 title: SRS HELM
 description: Helm Charts for SRS media server.
-github_username: ossrs
+github_username: ossrs/srs
 
 theme: minima
 plugins:

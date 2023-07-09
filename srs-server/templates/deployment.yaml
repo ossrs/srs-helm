@@ -40,6 +40,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.http }}
               protocol: TCP
+            - name: api
+              containerPort: {{ .Values.service.api }}
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /
@@ -48,6 +51,24 @@ spec:
             httpGet:
               path: /
               port: http
+          command: ["./objs/srs", "-e"]
+          env:
+            - name: SRS_LISTEN
+              value: "1935"
+            - name: SRS_HTTP_SERVER_LISTEN
+              value: "8080"
+            - name: SRS_HTTP_API_LISTEN
+              value: "1985"
+            {{- range $key, $value := .Values.conf }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            - name: SRS_DAEMON
+              value: "off"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

@@ -15,5 +15,9 @@ spec:
       port: {{ .Values.service.http }}
       targetPort: 8080
       protocol: TCP
+    - name: api
+      port: {{ .Values.service.api }}
+      targetPort: 1985
+      protocol: TCP
   selector:
     {{- include "srs.selectorLabels" . | nindent 4 }}
