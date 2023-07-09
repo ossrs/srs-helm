@@ -46,3 +46,10 @@ helm repo add srs http://localhost:3000/stable
 
 Now, you can utilize SRS HELM. For more information, refer to the [Usage](#usage) section.
 
+## Features
+
+Note all features of SRS are supported by the HELM charts, however, we're working to migrate them to HELM.
+
+- [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
+- [x] v1.0.1: Support HTTP origin server, for HTTP-FLV, listen at 8080/tcp.
+- [x] v1.0.1: Support HTTP static server, for HLS and players, listen at 8080/tcp.
