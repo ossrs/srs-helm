@@ -5,8 +5,38 @@ entries:
       category: Infrastructure
       licenses: MIT
     apiVersion: v2
+    appVersion: 5.0.166
+    created: "2023-07-10T07:10:33.546227+08:00"
+    description: SRS is a simple, high-efficiency, real-time video server supporting
+      RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
+    digest: 374f80f0244ced4dbe50bb3808bc9d6f9a213d9116d17480d9355f6ca94bdaa1
+    home: https://helm.ossrs.io/stable
+    icon: https://ossrs.io/lts/en-us/img/srs-220x234.png
+    keywords:
+    - srs
+    - media
+    - video
+    - rtmp
+    - hls
+    - webrtc
+    - srt
+    maintainers:
+    - email: winlinvip@gmail.com
+      name: Winlin
+      url: https://github.com/ossrs/srs-helm
+    name: srs-server
+    sources:
+    - https://github.com/ossrs/srs-helm/tree/v1.0.0/srs-server
+    type: application
+    urls:
+    - srs-server-1.0.2.tgz
+    version: 1.0.2
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
     appVersion: 5.0.157
-    created: "2023-07-09T18:54:58.99002+08:00"
+    created: "2023-07-10T07:10:33.545778+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: b944d81f7b850934282bcf7f7696b90d78ea40e0d0dabfcb7ccc0e698e8ab6e8
@@ -36,7 +66,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.157
-    created: "2023-07-09T18:54:58.989518+08:00"
+    created: "2023-07-10T07:10:33.544761+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: 11be4afbdab3f1ab8fa0f96cacca6a39a2db1087b0e4b68abdf0fb1a08ccb615
@@ -61,4 +91,4 @@ entries:
     urls:
     - srs-server-1.0.0.tgz
     version: 1.0.0
-generated: "2023-07-09T18:54:58.988078+08:00"
+generated: "2023-07-10T07:10:33.543864+08:00"
