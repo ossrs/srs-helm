@@ -19,5 +19,9 @@ spec:
       port: {{ .Values.service.api }}
       targetPort: 1985
       protocol: TCP
+    - name: srt
+      port: {{ .Values.service.srt }}
+      targetPort: 10080
+      protocol: UDP
   selector:
     {{- include "srs.selectorLabels" . | nindent 4 }}

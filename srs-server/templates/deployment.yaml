@@ -43,14 +43,9 @@ spec:
             - name: api
               containerPort: {{ .Values.service.api }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            - name: srt
+              containerPort: {{ .Values.service.srt }}
+              protocol: UDP
           command: ["./objs/srs", "-e"]
           env:
             - name: SRS_LISTEN
@@ -59,6 +54,8 @@ spec:
               value: "8080"
             - name: SRS_HTTP_API_LISTEN
               value: "1985"
+            - name: SRS_SRT_SERVER_LISTEN
+              value: "10080"
             {{- range $key, $value := .Values.conf }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -69,6 +66,14 @@ spec:
             {{- end }}
             - name: SRS_DAEMON
               value: "off"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

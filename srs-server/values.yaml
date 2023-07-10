@@ -20,9 +20,12 @@ replicaCount: 1
 conf:
   SRS_LOG_TANK: "console"
   SRS_HTTP_SERVER_ENABLED: "on"
+  SRS_HTTP_API_ENABLED: "on"
+  SRS_SRT_SERVER_ENABLED: "on"
   SRS_VHOST_HTTP_REMUX_ENABLED: "on"
   SRS_VHOST_HLS_ENABLED: "on"
-  SRS_HTTP_API_ENABLED: "on"
+  SRS_VHOST_SRT_ENABLED: "on"
+  SRS_VHOST_SRT_TO_RTMP: "on"
 
 # The environment variables to set in the container.
 env: []
@@ -60,6 +63,7 @@ service:
   rtmp: 1935
   http: 8080
   api: 1985
+  srt: 10080
 
 ingress:
   enabled: false
