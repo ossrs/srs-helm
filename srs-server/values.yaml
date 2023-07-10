@@ -21,16 +21,27 @@ conf:
   SRS_LOG_TANK: "console"
   SRS_HTTP_SERVER_ENABLED: "on"
   SRS_HTTP_API_ENABLED: "on"
-  SRS_SRT_SERVER_ENABLED: "on"
   SRS_VHOST_HTTP_REMUX_ENABLED: "on"
   SRS_VHOST_HLS_ENABLED: "on"
+  SRS_SRT_SERVER_ENABLED: "on"
   SRS_VHOST_SRT_ENABLED: "on"
   SRS_VHOST_SRT_TO_RTMP: "on"
+  SRS_RTC_SERVER_ENABLED: "on"
+  SRS_RTC_SERVER_CANDIDATE: "*"
+  SRS_VHOST_RTC_ENABLED: "on"
+  SRS_VHOST_RTC_RTMP_TO_RTC: "on"
+  SRS_VHOST_RTC_RTC_TO_RTMP: "on"
 
 # The environment variables to set in the container.
 env: []
   #- name: SRS_LOG_TANK
   #  value: "file"
+
+# The WebRTC candidate, which is your server's public IP address, can be accessed by the client.
+# See https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate for details.
+# Note that if this value is not empty, it will override the SRS_RTC_SERVER_CANDIDATE value in
+# both the {{.Values.conf}} and {{.Values.env}}.
+candidate: ""
 
 imagePullSecrets: []
 nameOverride: ""
@@ -64,6 +75,7 @@ service:
   http: 8080
   api: 1985
   srt: 10080
+  rtc: 8000
 
 ingress:
   enabled: false

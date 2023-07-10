@@ -26,11 +26,28 @@ To install the SRS origin server, run:
 helm install srs srs/srs-server
 ```
 
+> Note: If enable WebRTC, please setup the [CANDIDATE](https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate) 
+> by `helm install srs srs/srs-server --set candidate=your-internal-public-ip`
+
 Visit [http://localhost:8080](http://localhost:8080) to access the SRS console.
 
 For detailed information on using SRS, please refer to [https://ossrs.io](https://ossrs.io).
 
 > Note: If you are in China, please refer to [https://ossrs.net](https://ossrs.net).
+
+## Features
+
+Note all features of SRS are supported by the HELM charts, however, we're working to migrate them to HELM.
+
+- [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
+- [x] v1.0.1: Support HTTP origin server, for HTTP-FLV, listen at 8080/tcp.
+- [x] v1.0.1: Support HTTP static server, for HLS and players, listen at 8080/tcp.
+- [x] v1.0.2: Upgrade SRS to SRS v5.0-b2, 5.0 beta2, v5.0.166.
+- [x] v1.0.2: Support config SRS by env, enable HTTP-API, listen at 1985/tcp.
+- [x] v1.0.3: Support SRT stream server, listen at 10080/udp.
+- [x] v1.0.4: Support WebRTC stream server, listen at 8000/udp.
+- [ ] Support HTTPS server and API for WebRTC publisher.
+- [ ] Integrate Prometheus and grafana dashboard.
 
 ## Local Repository
 
@@ -88,14 +105,3 @@ helm repo add srs http://localhost:3000/stable
 ```
 
 Now, you can utilize SRS HELM. For more information, refer to the [Usage](#usage) section.
-
-## Features
-
-Note all features of SRS are supported by the HELM charts, however, we're working to migrate them to HELM.
-
-- [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
-- [x] v1.0.1: Support HTTP origin server, for HTTP-FLV, listen at 8080/tcp.
-- [x] v1.0.1: Support HTTP static server, for HLS and players, listen at 8080/tcp.
-- [x] v1.0.2: Upgrade SRS to SRS v5.0-b2, 5.0 beta2, v5.0.166.
-- [x] v1.0.2: Support config SRS by env, enable HTTP-API, listen at 1985/tcp.
-- [x] v1.0.3: Support SRT stream server, listen at 10080/udp.

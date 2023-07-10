@@ -33,6 +33,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["./objs/srs", "-e"]
           ports:
             - name: rtmp
               containerPort: {{ .Values.service.rtmp }}
@@ -46,8 +47,11 @@ spec:
             - name: srt
               containerPort: {{ .Values.service.srt }}
               protocol: UDP
-          command: ["./objs/srs", "-e"]
+            - name: rtc
+              containerPort: {{ .Values.service.rtc }}
+              protocol: UDP
           env:
+            # The general default config.
             - name: SRS_LISTEN
               value: "1935"
             - name: SRS_HTTP_SERVER_LISTEN
@@ -56,14 +60,26 @@ spec:
               value: "1985"
             - name: SRS_SRT_SERVER_LISTEN
               value: "10080"
+            - name: SRS_RTC_SERVER_LISTEN
+              value: "8000"
+            - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
+              value: "off"
+            # Overwrite the config by conf.
             {{- range $key, $value := .Values.conf }}
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+            # Overwrite the config by env.
             {{- range .Values.env }}
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+            # Overwrite by special item.
+            {{- if .Values.candidate }}
+            - name: SRS_RTC_SERVER_CANDIDATE
+              value: {{ .Values.candidate | quote }}
+            {{- end }}
+            # In docker, should always disable the daemon.
             - name: SRS_DAEMON
               value: "off"
           livenessProbe:
