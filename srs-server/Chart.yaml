@@ -1,7 +1,7 @@
 apiVersion: v2
 name: srs-server
 appVersion: "5.0.166"
-version: 1.0.4
+version: 1.0.5
 description: SRS is a simple, high-efficiency, real-time video server
   supporting RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
 home: https://helm.ossrs.io/stable

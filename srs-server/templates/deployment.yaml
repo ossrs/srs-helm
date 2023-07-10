@@ -64,6 +64,8 @@ spec:
               value: "8000"
             - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
               value: "off"
+            - name: SRS_PLATFORM
+              value: "helm"
             # Overwrite the config by conf.
             {{- range $key, $value := .Values.conf }}
             - name: {{ $key }}
