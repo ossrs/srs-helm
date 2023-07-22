@@ -1,4 +1,4 @@
-[![](https://badgen.net/discord/members/yZ4BnPmHAd)](https://discord.gg/yZ4BnPmHAd)
+[![](https://badgen.net/discord/members/CrQNVSC6M3)](https://discord.gg/CrQNVSC6M3)
 
 Helm Charts for the [SRS](https://github.com/ossrs/srs) media server.
 
