@@ -37,15 +37,17 @@ For detailed information on using SRS, please refer to [https://ossrs.io](https:
 
 ## Features
 
-Note all features of SRS are supported by the HELM charts, however, we're working to migrate them to HELM.
+Note all features of SRS and SRS Stack are supported by the HELM charts, however, we're working to 
+migrate them to HELM.
 
-- [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
-- [x] v1.0.1: Support HTTP origin server, for HTTP-FLV, listen at 8080/tcp.
-- [x] v1.0.1: Support HTTP static server, for HLS and players, listen at 8080/tcp.
+- [x] v1.0.5: Update docs and tags for charts.
+- [x] v1.0.4: Support WebRTC stream server, listen at 8000/udp.
+- [x] v1.0.3: Support SRT stream server, listen at 10080/udp.
 - [x] v1.0.2: Upgrade SRS to SRS v5.0-b2, 5.0 beta2, v5.0.166.
 - [x] v1.0.2: Support config SRS by env, enable HTTP-API, listen at 1985/tcp.
-- [x] v1.0.3: Support SRT stream server, listen at 10080/udp.
-- [x] v1.0.4: Support WebRTC stream server, listen at 8000/udp.
+- [x] v1.0.1: Support HTTP origin server, for HTTP-FLV, listen at 8080/tcp.
+- [x] v1.0.1: Support HTTP static server, for HLS and players, listen at 8080/tcp.
+- [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
 - [ ] Support HTTPS server and API for WebRTC publisher.
 - [ ] Integrate Prometheus and grafana dashboard.
 
