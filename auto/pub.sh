@@ -19,7 +19,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 if [ "$help" = true ]; then
-    echo "Usage: ./t.sh [OPTIONS]"
+    echo "Usage: $0 [OPTIONS]"
     echo "Options:"
     echo "  -h, --help           Show this help message and exit"
     echo "  -no-sync, --no-sync  Disable sync option. Default: false"

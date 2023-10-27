@@ -17,6 +17,7 @@ image:
 replicaCount: 1
 
 # The configuration for SRS can be overridden by environment variables.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
 conf:
   SRS_LOG_TANK: "console"
   SRS_HTTP_SERVER_ENABLED: "on"
@@ -33,6 +34,7 @@ conf:
   SRS_VHOST_RTC_RTC_TO_RTMP: "on"
 
 # The environment variables to set in the container.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
 env: []
   #- name: SRS_LOG_TANK
   #  value: "file"
