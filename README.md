@@ -107,3 +107,18 @@ helm repo add srs http://localhost:3000/stable
 ```
 
 Now, you can utilize SRS HELM. For more information, refer to the [Usage](#usage) section.
+
+## Release Chart Release
+
+To release chart new release, for example, release srs-server v1.0.6, firstly create new chart resource 
+file by following command:
+
+```bash
+./auto/srs-server.sh -target v1.0.6
+```
+
+Then, release the chart web server image and refresh official website by:
+
+```bash
+./auto/pub.sh
+```
