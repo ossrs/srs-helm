@@ -35,7 +35,7 @@ For detailed information on using SRS, please refer to [https://ossrs.io](https:
 
 > Note: If you are in China, please refer to [https://ossrs.net](https://ossrs.net).
 
-## Features
+## Features: srs-server
 
 Note all features of SRS and SRS Stack are supported by the HELM charts, however, we're working to 
 migrate them to HELM.
@@ -50,6 +50,10 @@ migrate them to HELM.
 - [x] v1.0.0: Support RTMP origin server, listen at 1935/tcp.
 - [ ] Support HTTPS server and API for WebRTC publisher.
 - [ ] Integrate Prometheus and grafana dashboard.
+
+## Features: srs-stack
+
+- [x] v1.0.0: Support RTMP, HTTP, HTTPS, SRT, and WebRTC in SRS Stack.
 
 ## Local Repository
 
@@ -115,6 +119,12 @@ file by following command:
 
 ```bash
 ./auto/srs-server.sh -target v1.0.6
+```
+
+And, maybe also release a new version of srs-stack v1.0.7, run:
+
+```bash
+./auto/srs-stack.sh -target v1.0.7
 ```
 
 Then, release the chart web server image and refresh official website by:

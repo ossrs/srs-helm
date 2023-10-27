@@ -15,7 +15,7 @@ keywords:
   - webrtc
   - srt
 sources:
-  - https://github.com/ossrs/srs-helm/tree/v1.0.0/srs-server
+  - https://github.com/ossrs/srs-helm/tree/v1.0.5/srs-server
 maintainers:
   - name: Winlin
     email: winlinvip@gmail.com

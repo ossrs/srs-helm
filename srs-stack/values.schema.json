@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Overrides the image tag whose default is the chart appVersion."
+        },
+        "pullPolicy": {
+          "type": "string"
+        }
+      }
+    },
+    "replicaCount": {
+      "type": "integer",
+      "const": 1,
+      "description": "Warning: Only support 1 replica right now."
+    }
+  }
+}

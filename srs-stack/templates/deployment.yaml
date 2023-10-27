@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "srs.fullname" . }}
+  labels:
+    {{- include "srs.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "srs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "srs.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "srs.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["./bootstrap"]
+          ports:
+            - name: rtmp
+              containerPort: 1935
+              protocol: TCP
+            - name: http
+              containerPort: 2022
+              protocol: TCP
+            - name: https
+              containerPort: 2443
+              protocol: TCP
+            - name: srt
+              containerPort: 10080
+              protocol: UDP
+            - name: rtc
+              containerPort: 8000
+              protocol: UDP
+          env:
+            # The general default config.
+            - name: SRS_PLATFORM
+              value: "helm"
+            # Overwrite the config by conf.
+            {{- range $key, $value := .Values.conf }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            # Overwrite the config by env.
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            # Overwrite by special item.
+            {{- if .Values.candidate }}
+            - name: SRS_RTC_SERVER_CANDIDATE
+              value: {{ .Values.candidate | quote }}
+            {{- end }}
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+            # For SRS Stack, we resolve the ip in platform.
+            - name: SRS_RTC_SERVER_API_AS_CANDIDATES
+              value: "off"
+            # For SRS Stack, never detect network ip, because it runs in docker, and the ip is private.
+            - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
+              value: "off"
+            # For SRS Stack, should always enable daemon.
+            - name: SRS_DAEMON
+              value: "on"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

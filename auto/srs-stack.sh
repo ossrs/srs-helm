@@ -33,7 +33,7 @@ if [[ ! -z $target ]]; then
     RELEASE=$target
     refresh=yes
 else
-    RELEASE=$(git describe --tags --abbrev=0 --match srs-server-v* |sed 's/srs-server-//g')
+    RELEASE=$(git describe --tags --abbrev=0 --match srs-stack-v* |sed 's/srs-stack-//g')
 fi
 if [[ $? -ne 0 ]]; then echo "Release failed"; exit 1; fi
 
@@ -48,9 +48,9 @@ VERSION=$(echo $RELEASE |sed 's/v//g')
 TAG=$RELEASE
 echo "RELEASE=$RELEASE, VERSION=$VERSION, TAG=$TAG, REVISION=$REVISION, NEXT=$NEXT"
 
-if [[ $(grep -q "version: $VERSION" srs-server/Chart.yaml || echo no) == no ]]; then
-  VERSION0="sed -i '' 's/^version:.*/version: $VERSION/g' srs-server/Chart.yaml"
-  VERSION1="sed -i '' 's|v1.*/srs-server|$TAG/srs-server|g' srs-server/Chart.yaml"
+if [[ $(grep -q "version: $VERSION" srs-stack/Chart.yaml || echo no) == no ]]; then
+  VERSION0="sed -i '' 's/^version:.*/version: $VERSION/g' srs-stack/Chart.yaml"
+  VERSION1="sed -i '' 's|v1.*/srs-stack|$TAG/srs-stack|g' srs-stack/Chart.yaml"
 fi
 if [[ ! -z $VERSION0 || ! -z $VERSION1 ]]; then
     echo "Please update version to $VERSION"
@@ -60,10 +60,10 @@ if [[ ! -z $VERSION0 || ! -z $VERSION1 ]]; then
     exit 1
 fi
 
-if [[ ! -f stable/srs-server-$VERSION.tgz ]]; then
-  echo "Failed: No package at stable/srs-server-$VERSION.tgz"
+if [[ ! -f stable/srs-stack-$VERSION.tgz ]]; then
+  echo "Failed: No package at stable/srs-stack-$VERSION.tgz"
   echo "Please run:"
-  echo "    helm package srs-server -d stable && \\"
+  echo "    helm package srs-stack -d stable && \\"
   echo "    helm repo index stable"
   exit 1
 fi
@@ -89,5 +89,5 @@ git tag $TAG && git push origin $TAG
 echo "Publish OK: $TAG"
 
 echo -e "\n\n"
-echo "Chart srs-server $VERSION ok, please release to official website by:"
+echo "Chart srs-stack $VERSION ok, please release to official website by:"
 echo "    ./auto/pub.sh"

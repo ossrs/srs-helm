@@ -1,0 +1,109 @@
+# Copyright ossrs, Inc.
+# SPDX-License-Identifier: MIT
+
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+##
+
+## @section Common parameters
+##
+
+image:
+  repository: ossrs/srs-stack
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# The configuration for SRS can be overridden by environment variables.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
+conf:
+  SRS_LOG_TANK: "console"
+
+# The environment variables to set in the container.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
+env: []
+  #- name: SRS_LOG_TANK
+  #  value: "file"
+
+# The WebRTC candidate, which is your server's public IP address, can be accessed by the client.
+# See https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate for details.
+# Note that if this value is not empty, it will override the SRS_RTC_SERVER_CANDIDATE value in
+# both the {{.Values.conf}} and {{.Values.env}}.
+candidate: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: LoadBalancer
+  rtmp: 1935
+  http: 80
+  https: 443
+  srt: 10080
+  rtc: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
