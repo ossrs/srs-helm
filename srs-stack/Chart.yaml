@@ -1,7 +1,7 @@
 apiVersion: v2
 name: srs-stack
-appVersion: "5.11.5"
-version: 1.0.1
+appVersion: "5.11.10"
+version: 1.0.2
 description: SRS Stack is a one-click, open-source video solution for creating online services on
   cloud or self-hosting. Built with SRS, FFmpeg, and WebRTC, it supports various protocols and offers
   features like authentication, multi-platform streaming, recording, transcoding, virtual live events,
@@ -17,7 +17,7 @@ keywords:
   - webrtc
   - srt
 sources:
-  - https://github.com/ossrs/srs-helm/tree/v1.0.1/srs-stack
+  - https://github.com/ossrs/srs-helm/tree/v1.0.2/srs-stack
 maintainers:
   - name: Winlin
     email: winlinvip@gmail.com
