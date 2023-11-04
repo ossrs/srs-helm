@@ -69,6 +69,9 @@ spec:
             - name: SRS_RTC_SERVER_CANDIDATE
               value: {{ .Values.candidate | quote }}
             {{- end }}
+            # Enable self-sign certificate by default.
+            - name: AUTO_SELF_SIGNED_CERTIFICATE
+              value: "on"
             # Enable dns name lookup.
             - name: NAME_LOOKUP
               value: "on"
