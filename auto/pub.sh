@@ -46,10 +46,8 @@ if [[ $? -ne 0 ]]; then
 fi
 
 git tag -d $REPO_TAG 2>/dev/null; git push origin :$REPO_TAG 2>/dev/null
-git tag -d $SRS_SERVER_TAG 2>/dev/null; git push origin :$SRS_SERVER_TAG 2>/dev/null
-echo "Delete tag OK: $REPO_TAG $SRS_SERVER_TAG"
+echo "Delete tag OK: $REPO_TAG"
 
 git tag $REPO_TAG && git push origin $REPO_TAG
-git tag $SRS_SERVER_TAG && git push origin $SRS_SERVER_TAG
-echo "Publish OK: $REPO_TAG $SRS_SERVER_TAG"
+echo "Publish OK: $REPO_TAG"
 echo "    https://github.com/ossrs/srs-helm/actions"
