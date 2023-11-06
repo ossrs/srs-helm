@@ -36,7 +36,9 @@ spec:
           volumeMounts:
             - mountPath: "/data"
               name: srs-pv-storage
+              {{- if .Values.persistence.subPath }}
               subPath: {{ .Values.persistence.subPath | quote }}
+              {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
