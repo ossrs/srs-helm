@@ -1,0 +1,30 @@
+{{- if (.Values.persistence.enabled) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: srs-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: srs-disk-storage
+  capacity:
+    storage: {{ .Values.persistence.storage }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: {{ .Values.persistence.path }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: srs-pv-claim
+spec:
+  storageClassName: srs-disk-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistence.storage }}
+{{- end }}

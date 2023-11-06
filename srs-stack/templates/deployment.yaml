@@ -20,6 +20,10 @@ spec:
       labels:
         {{- include "srs.selectorLabels" . | nindent 8 }}
     spec:
+      volumes:
+        - name: srs-pv-storage
+          persistentVolumeClaim:
+            claimName: srs-pv-claim
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -29,6 +33,10 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: srs-pv-storage
+              subPath: {{ .Values.persistence.subPath | quote }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

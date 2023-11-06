@@ -59,6 +59,18 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+## Persistence parameters
+## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistence:
+  ## @param persistence.enabled Enable persistence.
+  enabled: true
+  ## @param persistence.path The path of the hostPath.
+  path: /data
+  ## @param persistence.storage The size of the volume to allocate.
+  storage: 3000Gi
+  ## @param persistence.subPath The subdirectory of the volume to mount.
+  subPath: "0"
+
 service:
   type: LoadBalancer
   rtmp: 1935

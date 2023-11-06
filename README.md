@@ -26,10 +26,15 @@ To install the SRS origin server, run:
 helm install srs srs/srs-server
 ```
 
-> Note: If enable WebRTC, please setup the [CANDIDATE](https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate) 
-> by `helm install srs srs/srs-server --set candidate=your-internal-public-ip`
-
 Visit [http://localhost:8080](http://localhost:8080) to access the SRS console.
+
+Important config for both srs-server and srs-stack:
+
+* If enable WebRTC, please setup the [CANDIDATE](https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate) by `helm install srs srs/srs-server --set candidate=your-internal-public-ip`
+
+Important config for srs-stack only:
+
+* By default, use `/data` of host as storage directory, if want to change, please use `--set persistence.path=$HOME/data` for example.
 
 For detailed information on using SRS, please refer to [https://ossrs.io](https://ossrs.io).
 
@@ -95,7 +100,19 @@ Now, you can utilize SRS HELM. For more information, refer to the [Usage](#usage
 
 ## Develop Repository
 
-Serve current directory in Nginx or other HTTP server, for example:
+The simplest way to develop is to build a new chart by:
+
+```bash
+helm package srs-server
+```
+
+Then install the local chart by:
+
+```bash
+helm install srs srs-server-1.0.0.tgz
+```
+
+Or, to test the repo, serve current directory in Nginx or other HTTP server, for example:
 
 ```bash
 docker run --rm -it -p 3000:80 -v $(pwd):/usr/share/nginx/html \
