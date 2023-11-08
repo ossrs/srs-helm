@@ -79,6 +79,13 @@ spec:
             - name: SRS_RTC_SERVER_CANDIDATE
               value: {{ .Values.candidate | quote }}
             {{- end }}
+            # For multiple instances expose different ports.
+            - name: RTMP_PORT
+              value: {{ .Values.service.rtmp | quote }}
+            - name: SRT_PORT
+              value: {{ .Values.service.srt | quote }}
+            - name: RTC_PORT
+              value: {{ .Values.service.rtc | quote }}
             # Enable self-sign certificate by default.
             - name: AUTO_SELF_SIGNED_CERTIFICATE
               value: "on"
