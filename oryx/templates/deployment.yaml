@@ -92,13 +92,13 @@ spec:
             # Enable dns name lookup.
             - name: NAME_LOOKUP
               value: "on"
-            # For SRS Stack, we resolve the ip in platform.
+            # For Oryx, we resolve the ip in platform.
             - name: SRS_RTC_SERVER_API_AS_CANDIDATES
               value: "off"
-            # For SRS Stack, never detect network ip, because it runs in docker, and the ip is private.
+            # For Oryx, never detect network ip, because it runs in docker, and the ip is private.
             - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
               value: "off"
-            # For SRS Stack, should always enable daemon.
+            # For Oryx, should always enable daemon.
             - name: SRS_DAEMON
               value: "on"
           livenessProbe:

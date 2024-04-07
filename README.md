@@ -28,11 +28,11 @@ helm install srs srs/srs-server
 
 Visit [http://localhost:8080](http://localhost:8080) to access the SRS console.
 
-Important config for both srs-server and srs-stack:
+Important config for both srs-server and Oryx:
 
 * If enable WebRTC, please setup the [CANDIDATE](https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate) by `helm install srs srs/srs-server --set candidate=your-internal-public-ip`
 
-Important config for srs-stack only:
+Important config for Oryx only:
 
 * By default, use `/data` of host as storage directory, if want to change, please use `--set persistence.path=$HOME/data` for example.
 
@@ -42,7 +42,7 @@ For detailed information on using SRS, please refer to [https://ossrs.io](https:
 
 ## Features: srs-server
 
-Note all features of SRS and SRS Stack are supported by the HELM charts, however, we're working to 
+Note all features of SRS and Oryx are supported by the HELM charts, however, we're working to 
 migrate them to HELM.
 
 - [x] v1.0.5: Update docs and tags for charts.
@@ -56,9 +56,9 @@ migrate them to HELM.
 - [ ] Support HTTPS server and API for WebRTC publisher.
 - [ ] Integrate Prometheus and grafana dashboard.
 
-## Features: srs-stack
+## Features: Oryx
 
-- [x] v1.0.0: Support RTMP, HTTP, HTTPS, SRT, and WebRTC in SRS Stack.
+- [x] v1.0.0: Support RTMP, HTTP, HTTPS, SRT, and WebRTC in Oryx.
 
 ## Local Repository
 
@@ -138,10 +138,10 @@ file by following command:
 ./auto/srs-server.sh -target v1.0.6
 ```
 
-And, maybe also release a new version of srs-stack v1.0.7, run:
+And, maybe also release a new version of Oryx v1.0.7, run:
 
 ```bash
-./auto/srs-stack.sh -target v1.0.7
+./auto/oryx.sh -target v1.0.7
 ```
 
 Then, release the chart web server image and refresh official website by:

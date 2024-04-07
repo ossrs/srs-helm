@@ -1,8 +1,8 @@
 apiVersion: v2
-name: srs-stack
+name: oryx
 appVersion: "5.11.14"
 version: 1.0.5
-description: SRS Stack is an all-in-one, one-click, and open-source video solution for creating online
+description: Oryx(SRS Stack) is an all-in-one, one-click, and open-source video solution for creating online
   services on cloud or self-hosting. Built with SRS, FFmpeg, and WebRTC, it supports various protocols
   and offers features like authentication, multi-platform streaming, recording, transcoding, virtual
   live events, automatic HTTPS, and HTTP Open API.
@@ -17,7 +17,7 @@ keywords:
   - webrtc
   - srt
 sources:
-  - https://github.com/ossrs/srs-helm/tree/v1.0.2/srs-stack
+  - https://github.com/ossrs/srs-helm/tree/v1.0.2/oryx
 maintainers:
   - name: Winlin
     email: winlinvip@gmail.com

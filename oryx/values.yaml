@@ -10,7 +10,7 @@
 ##
 
 image:
-  repository: ossrs/srs-stack
+  repository: ossrs/oryx
   tag: ""
   pullPolicy: IfNotPresent
 
