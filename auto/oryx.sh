@@ -25,7 +25,7 @@ if [ "$help" = true ]; then
     echo "Options:"
     echo "  -h, --help           Show this help message and exit"
     echo "  -refresh, --refresh  Refresh current tag. Default: false"
-    echo "  -target, --target    The target version to release, for example, v5.7.28"
+    echo "  -target, --target    The target version to release, for example, v1.0.7"
     exit 0
 fi
 
