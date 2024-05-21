@@ -5,8 +5,41 @@ entries:
       category: Infrastructure
       licenses: MIT
     apiVersion: v2
+    appVersion: 5.14.19
+    created: "2024-05-21T19:53:17.939919+08:00"
+    description: Oryx(SRS Stack) is an all-in-one, one-click, and open-source video
+      solution for creating online services on cloud or self-hosting. Built with SRS,
+      FFmpeg, and WebRTC, it supports various protocols and offers features like authentication,
+      multi-platform streaming, recording, transcoding, virtual live events, automatic
+      HTTPS, and HTTP Open API.
+    digest: 649c9c355649590343d9ad46722325a6c1dba04ca4785ab0476b1880b0859532
+    home: https://helm.ossrs.io/stable
+    icon: https://ossrs.io/lts/en-us/img/srs-220x234.png
+    keywords:
+    - srs
+    - media
+    - video
+    - rtmp
+    - hls
+    - webrtc
+    - srt
+    maintainers:
+    - email: winlinvip@gmail.com
+      name: Winlin
+      url: https://github.com/ossrs/srs-helm
+    name: oryx
+    sources:
+    - https://github.com/ossrs/srs-helm/tree/v1.0.7/oryx
+    type: application
+    urls:
+    - oryx-1.0.7.tgz
+    version: 1.0.7
+  - annotations:
+      category: Infrastructure
+      licenses: MIT
+    apiVersion: v2
     appVersion: 5.11.14
-    created: "2024-04-07T16:16:17.40309+08:00"
+    created: "2024-05-21T19:53:17.939575+08:00"
     description: Oryx(SRS Stack) is an all-in-one, one-click, and open-source video
       solution for creating online services on cloud or self-hosting. Built with SRS,
       FFmpeg, and WebRTC, it supports various protocols and offers features like authentication,
@@ -40,7 +73,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.166
-    created: "2024-04-07T16:16:17.405758+08:00"
+    created: "2024-05-21T19:53:17.942101+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: 07dbb278f814a39b3362e2e626fc0a2204ea1458867fd9480fa6050e1b8d1fa6
@@ -70,7 +103,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.166
-    created: "2024-04-07T16:16:17.405353+08:00"
+    created: "2024-05-21T19:53:17.941777+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: 2ac770b72abee9cf5b21e62e84574cb6c9a88151117849a8256c7836564a2201
@@ -100,7 +133,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.166
-    created: "2024-04-07T16:16:17.404965+08:00"
+    created: "2024-05-21T19:53:17.941457+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: 7038959be27113ad9735d44a005894803d5a0b7c8dde107b09748e82811b57a8
@@ -130,7 +163,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.166
-    created: "2024-04-07T16:16:17.404577+08:00"
+    created: "2024-05-21T19:53:17.941145+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: abb3f581543235edd805262b010f3d8d2759b844848dab0f8206082d6c4f161c
@@ -160,7 +193,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.157
-    created: "2024-04-07T16:16:17.404156+08:00"
+    created: "2024-05-21T19:53:17.940739+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: b944d81f7b850934282bcf7f7696b90d78ea40e0d0dabfcb7ccc0e698e8ab6e8
@@ -190,7 +223,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.0.157
-    created: "2024-04-07T16:16:17.403655+08:00"
+    created: "2024-05-21T19:53:17.940378+08:00"
     description: SRS is a simple, high-efficiency, real-time video server supporting
       RTMP, WebRTC, HLS, HTTP-FLV, SRT, MPEG-DASH, and GB28181.
     digest: 11be4afbdab3f1ab8fa0f96cacca6a39a2db1087b0e4b68abdf0fb1a08ccb615
@@ -221,7 +254,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.11.14
-    created: "2024-04-07T16:16:17.408303+08:00"
+    created: "2024-05-21T19:53:17.944092+08:00"
     description: SRS Stack is an all-in-one, one-click, and open-source video solution
       for creating online services on cloud or self-hosting. Built with SRS, FFmpeg,
       and WebRTC, it supports various protocols and offers features like authentication,
@@ -254,7 +287,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.11.13
-    created: "2024-04-07T16:16:17.40732+08:00"
+    created: "2024-05-21T19:53:17.943599+08:00"
     description: SRS Stack is an all-in-one, one-click, and open-source video solution
       for creating online services on cloud or self-hosting. Built with SRS, FFmpeg,
       and WebRTC, it supports various protocols and offers features like authentication,
@@ -287,7 +320,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.11.10
-    created: "2024-04-07T16:16:17.406837+08:00"
+    created: "2024-05-21T19:53:17.943046+08:00"
     description: SRS Stack is an all-in-one, one-click, and open-source video solution
       for creating online services on cloud or self-hosting. Built with SRS, FFmpeg,
       and WebRTC, it supports various protocols and offers features like authentication,
@@ -320,7 +353,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.11.10
-    created: "2024-04-07T16:16:17.406469+08:00"
+    created: "2024-05-21T19:53:17.942727+08:00"
     description: SRS Stack is a one-click, open-source video solution for creating
       online services on cloud or self-hosting. Built with SRS, FFmpeg, and WebRTC,
       it supports various protocols and offers features like authentication, multi-platform
@@ -353,7 +386,7 @@ entries:
       licenses: MIT
     apiVersion: v2
     appVersion: 5.11.5
-    created: "2024-04-07T16:16:17.406127+08:00"
+    created: "2024-05-21T19:53:17.94241+08:00"
     description: SRS Stack is a one-click, open-source video solution for creating
       online services on cloud or self-hosting. Built with SRS, FFmpeg, and WebRTC,
       it supports various protocols and offers features like authentication, multi-platform
@@ -381,4 +414,4 @@ entries:
     urls:
     - srs-stack-1.0.1.tgz
     version: 1.0.1
-generated: "2024-04-07T16:16:17.402603+08:00"
+generated: "2024-05-21T19:53:17.938284+08:00"
