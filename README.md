@@ -58,6 +58,7 @@ migrate them to HELM.
 
 ## Features: Oryx
 
+- [x] v1.0.7: Upgrade Oryx to 5.14.19 in Chart.yaml.
 - [x] v1.0.6: Rename SRS Stack to Oryx.
 - [x] v1.0.0: Support RTMP, HTTP, HTTPS, SRT, and WebRTC in Oryx.
 
