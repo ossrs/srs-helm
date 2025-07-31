@@ -5,22 +5,40 @@
     "image": {
       "type": "object",
       "properties": {
-        "repository": {
-          "type": "string"
-        },
+        "repository": { "type": "string" },
         "tag": {
           "type": "string",
           "description": "Overrides the image tag whose default is the chart appVersion."
         },
-        "pullPolicy": {
-          "type": "string"
-        }
+        "pullPolicy": { "type": "string" }
       }
     },
     "replicaCount": {
       "type": "integer",
       "const": 1,
       "description": "Warning: Only support 1 replica right now."
+    },
+    "extraContainers": {
+      "type": "array",
+      "description": "Additional sidecar containers to add to the pod.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "extraVolumes": {
+      "type": "array",
+      "description": "Additional volumes to mount in the pod.",
+      "items": {
+        "type": "object"
+      }
+    },
+    "extraVolumeMounts": {
+      "type": "array",
+      "description": "Additional volume mounts for the main container.",
+      "items": {
+        "type": "object"
+      }
     }
   }
 }
+
