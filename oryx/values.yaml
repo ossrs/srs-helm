@@ -10,8 +10,8 @@
 ##
 
 image:
-  repository: ossrs/oryx
-  tag: ""
+  repository: zpcat/oryx
+  tag: forward-x64
   pullPolicy: IfNotPresent
 
 replicaCount: 1
