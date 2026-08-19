@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oryx-nginx-hls.fullname" . }}
+  labels:
+    {{- include "oryx-nginx-hls.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "oryx-nginx-hls.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oryx-nginx-hls.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: oryx-pv-storage
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: oryx-pv-claim
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "oryx-nginx-hls.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: oryx-pv-storage
+              {{- if .Values.persistence.subPath }}
+              subPath: {{ .Values.persistence.subPath | quote }}
+              {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["./bootstrap"]
+          ports:
+            - name: rtmp
+              containerPort: 1935
+              protocol: TCP
+            - name: http
+              containerPort: 2022
+              protocol: TCP
+            - name: https
+              containerPort: 2443
+              protocol: TCP
+            - name: srt
+              containerPort: 10080
+              protocol: UDP
+            - name: rtc
+              containerPort: 8000
+              protocol: UDP
+            - name: rtc-over-tcp
+              containerPort: 8000
+              protocol: TCP
+          env:
+            # The general default config.
+            - name: SRS_PLATFORM
+              value: "helm"
+            # Overwrite the config by conf.
+            {{- range $key, $value := .Values.conf }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- if .Values.global.hlsFragment }}
+            - name: SRS_VHOST_HLS_HLS_FRAGMENT
+              value: {{ .Values.global.hlsFragment | quote }}
+            {{- end }}
+            # Overwrite the config by env.
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            # Overwrite by special item.
+            {{- if .Values.candidate }}
+            - name: SRS_RTC_SERVER_CANDIDATE
+              value: {{ .Values.candidate | quote }}
+            {{- end }}
+            # For multiple instances expose different ports.
+            - name: RTMP_PORT
+              value: {{ .Values.service.rtmp | quote }}
+            - name: SRT_PORT
+              value: {{ .Values.service.srt | quote }}
+            - name: RTC_PORT
+              value: {{ .Values.service.rtc | quote }}
+            # Enable self-sign certificate by default.
+            - name: AUTO_SELF_SIGNED_CERTIFICATE
+              value: "on"
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+            # For Oryx, we resolve the ip in platform.
+            - name: SRS_RTC_SERVER_API_AS_CANDIDATES
+              value: "off"
+            # For Oryx, never detect network ip, because it runs in docker, and the ip is private.
+            - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
+              value: "off"
+            # For Oryx, should always enable daemon.
+            - name: SRS_DAEMON
+              value: "on"
+          livenessProbe:
+            httpGet:
+              path: /terraform/v1/mgmt/versions
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /terraform/v1/mgmt/versions
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

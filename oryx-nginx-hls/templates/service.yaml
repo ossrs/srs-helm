@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.global.oryxSvcTcp }}
+  name: {{ .Values.global.oryxSvcTcp }}
+  {{- else -}}
+  name: {{ include "oryx-nginx-hls.fullname" . }}-tcp
+  {{- end }}
+  labels:
+    {{- include "oryx-nginx-hls.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: rtmp
+      port: {{ .Values.service.rtmp }}
+      targetPort: 1935
+      protocol: TCP
+    - name: http
+      port: {{ .Values.service.http }}
+      targetPort: 2022
+      protocol: TCP
+    - name: https
+      port: {{ .Values.service.https }}
+      targetPort: 2443
+      protocol: TCP
+    - name: rtc-over-tcp
+      port: {{ .Values.service.rtc }}
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    {{- include "oryx-nginx-hls.selectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.global.oryxSvcUdp }}
+  name: {{ .Values.global.oryxSvcUdp }}
+  {{- else -}}
+  name: {{ include "oryx-nginx-hls.fullname" . }}-udp
+  {{- end }}
+  labels:
+    {{- include "oryx-nginx-hls.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports: 
+    - name: srt
+      port: {{ .Values.service.srt }}
+      targetPort: 10080
+      protocol: UDP
+    - name: rtc
+      port: {{ .Values.service.rtc }}
+      targetPort: 8000
+      protocol: UDP
+  selector:
+    {{- include "oryx-nginx-hls.selectorLabels" . | nindent 4 }}

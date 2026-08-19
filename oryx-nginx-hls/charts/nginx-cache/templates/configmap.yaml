@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.edge.http.conf.template: |
+    proxy_cache_path  {{ .Values.nginxCachePath }} levels=1:2 keys_zone=srs_cache:8m max_size=1000m inactive=600m;
+    proxy_temp_path {{ .Values.nginxCachePath }}/tmp;
+
+    server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        proxy_cache_valid  404 10s;
+        proxy_cache_lock on;
+        proxy_cache_lock_age 300s;
+        proxy_cache_lock_timeout 300s;
+        proxy_cache_min_uses 1;
+
+        location ~ /.+/.*\.(m3u8)$ {
+            proxy_set_header Host $host;
+            proxy_pass http://${ {{- .Values.global.oryxSvcTcp | upper | replace "-" "_"}}_SERVICE_HOST}:${ {{- .Values.global.oryxSvcTcp | upper | replace "-" "_"}}_SERVICE_PORT_HTTP}$request_uri;
+
+            proxy_cache srs_cache;
+            proxy_cache_key $scheme$proxy_host$uri$args;
+            proxy_cache_valid  200 302 ${SRS_M3U8_EXPIRE}s;
+            add_header X-Cache-Status $upstream_cache_status;
+
+            # the internal DNS of k8s cluster, keep it if use service name as address.
+            # e.g. [service name].[namespace].svc.cluster.local as address
+            # resolver kube-dns.kube-system.svc.cluster.local;
+        }
+
+        location ~ /.+/.*\.(ts)$ {
+            proxy_set_header Host $host;
+            proxy_pass http://${ {{- .Values.global.oryxSvcTcp | upper | replace "-" "_"}}_SERVICE_HOST}:${ {{- .Values.global.oryxSvcTcp | upper | replace "-" "_"}}_SERVICE_PORT_HTTP}$request_uri;
+
+            proxy_cache srs_cache;
+            proxy_cache_key $scheme$proxy_host$uri;
+            proxy_cache_valid  200 302 ${SRS_TS_EXPIRE}s;
+            add_header X-Cache-Status $upstream_cache_status;
+            
+            # resolver kube-dns.kube-system.svc.cluster.local;
+        }
+    }
+
+  index.html: |
+    <html>
+    <head>
+        <title>Nginx Cache</title>
+        <meta charset="utf-8">
+        <style>
+            .code {
+                background-color: rgb(217, 222, 227);
+                padding: 2px;
+                overflow: auto;
+                font-size: 85%;
+                line-height: 1.45;
+                border-radius: 6px;
+                word-break: normal;
+                word-wrap: normal;
+                box-sizing: border-box;
+                white-space: pre;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Nginx</h1>
+            <p>Congratulations! Nginx Ready!<a href="https://github.com/ossrs/srs">SRS</a> works!</p>
+            <hr/>
+            <h2>Nginx Cache</h2>
+        </div>
+    </body>

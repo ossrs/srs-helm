@@ -1,0 +1,151 @@
+# Copyright ossrs, Inc.
+# SPDX-License-Identifier: MIT
+
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+##
+
+## @section Common parameters
+##
+
+image:
+  repository: ossrs/oryx
+  tag: ""
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+# The configuration for SRS can be overridden by environment variables.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
+conf:
+  SRS_LOG_TANK: "console"
+  # check the global value hlsFragment which control the duration of one ts segment.
+  # HLS_WINDOW is the max media duration in m3u8 playlist, and is also the max video latency.
+  SRS_VHOST_HLS_HLS_WINDOW: 10
+  # HLS_CTX and HLS_TS_CTX must be off for nginx edge, they will make the nginx cache missed.
+  SRS_VHOST_HLS_HLS_CTX: "off"
+  SRS_VHOST_HLS_HLS_TS_CTX: "off"
+  # above four confs used to force HLS high performance and HLS Low Latency
+  # config RTC Port protocol: "tcp", "udp", "all"
+  SRS_RTC_SERVER_PROTOCOL: "tcp"
+  # Wether to enable WebRTC over TCP.
+  # if you want to config RTC over TCP only
+  #   SRS_RTC_SERVER_PROTOCOL: "tcp"
+  #   SRS_RTC_SERVER_TCP_ENABLED: "on"
+  # if you want to config RTC over both TCP and UDP
+  #   SRS_RTC_SERVER_PROTOCOL: "all"
+  #   SRS_RTC_SERVER_TCP_ENABLED: "on"
+  # if you want to config RTC over UDP only
+  #   SRS_RTC_SERVER_PROTOCOL: "udp"
+  #   SRS_RTC_SERVER_TCP_ENABLED: "off"
+  SRS_RTC_SERVER_TCP_ENABLED: "on"
+# The environment variables to set in the container.
+# See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
+env: []
+  #- name: SRS_LOG_TANK
+  #  value: "file"
+
+# The WebRTC candidate, which is your server's public IP address, can be accessed by the client.
+# See https://ossrs.io/lts/en-us/docs/v5/doc/webrtc#config-candidate for details.
+# Note that if this value is not empty, it will override the SRS_RTC_SERVER_CANDIDATE value in
+# both the {{.Values.conf}} and {{.Values.env}}.
+# apply a public static IP, binding it to the {{ .Values.global.oryxSvcTcp }} service.
+# config candidate to this public static IP.
+candidate: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Persistence parameters
+## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+persistence:
+  ## @param persistence.enabled Enable persistence.
+  enabled: false
+  ## @param persistence.className the storageClassName.
+  className: "standard"
+  ## @param persistence.path The path of the hostPath.
+  path: /data
+  ## @param persistence.storage The size of the volume to allocate.
+  storage: 30Gi
+  ## @param persistence.subPath The subdirectory of the volume to mount.
+  # subPath: "0"
+
+service:
+  type: LoadBalancer
+  rtmp: 1935
+  http: 2080
+  https: 2443
+  srt: 10080
+  rtc: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: localhost
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+global:
+  oryxSvcTcp: oryx-svc-tcp
+  oryxSvcUdp: oryx-svc-udp
+  # hlsFragment which control the duration of one ts segment.
+  # which must be equal or greater then the SRS_M3U8_EXPIRE in nginx-cache pod.
+  hlsFragment: 2
