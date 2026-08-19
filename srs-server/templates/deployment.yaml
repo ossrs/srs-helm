@@ -36,19 +36,19 @@ spec:
           command: ["./objs/srs", "-e"]
           ports:
             - name: rtmp
-              containerPort: {{ .Values.service.rtmp }}
+              containerPort: 1935
               protocol: TCP
             - name: http
-              containerPort: {{ .Values.service.http }}
+              containerPort: 8080
               protocol: TCP
             - name: api
-              containerPort: {{ .Values.service.api }}
+              containerPort: 1985
               protocol: TCP
             - name: srt
-              containerPort: {{ .Values.service.srt }}
+              containerPort: 10080
               protocol: UDP
             - name: rtc
-              containerPort: {{ .Values.service.rtc }}
+              containerPort: 8000
               protocol: UDP
           env:
             # The general default config.
@@ -86,12 +86,20 @@ spec:
               value: "off"
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /api/v1/versions
+              port: api
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            failureThreshold: 3
+            periodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

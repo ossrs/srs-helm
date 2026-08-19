@@ -14,6 +14,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+# simple set replicaCount more than one don't make sense, because the default srs config is stateful app.
 replicaCount: 1
 
 # The configuration for SRS can be overridden by environment variables.
@@ -107,6 +108,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# simple open autoscaling don't make sense, because the default srs config is stateful app.
 autoscaling:
   enabled: false
   minReplicas: 1
