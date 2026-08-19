@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.oryxName }}
+  labels: {{- include "oryx-origin-cluster.oryxLabels" . | nindent 4 }}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: {{ .Values.service.http }}
+      targetPort: 2022
+      protocol: TCP
+    - name: https
+      port: {{ .Values.service.https }}
+      targetPort: 2443
+      protocol: TCP
+  selector:
+    {{- include "oryx-origin-cluster.oryxSelectorLabels" . | nindent 4 }}

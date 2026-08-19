@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oryx-origin-cluster.oryx-name" . }}
+  labels:
+    {{- include "oryx-origin-cluster.oryxLabels" . | nindent 4 }}
+spec:
+  stragegy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "oryx-origin-cluster.oryxSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oryx-origin-cluster.oryxLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-redis
+          image: "{{ .Values.image.redisRepository }}:{{ .Values.image.redisTag }}"
+          imagePullPolicy: {{ .Values.image.redisPullPolicy }}
+          command:
+          - sh
+          - -c
+          - |-
+            until redis-cli -h  {{ .Values.service.redisName }} ping
+            do
+              echo "redis ping failed, continue after 3 seconds"
+              sleep 3
+            done
+        - name: wait-proxy
+          image: "curlimages/curl:8.10.1"
+          imagePullPolicy: IfNotPresent
+          command:
+          - sh
+          - -c
+          - |-
+            until curl --output /dev/null --silent --head --fail {{ .Values.service.proxyName }}:{{ .Values.service.proxyApi }}/api/v1/versions
+            do
+              echo "srs not ready, continue after 3 seconds"
+              sleep 3
+            done
+      containers:
+        - name: "oryx"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.oryxRepository }}:{{ .Values.image.oryxTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.oryxPullPolicy }}
+          command: ["./platform"]
+          ports:
+            - name: http
+              containerPort: 2022
+              protocol: TCP
+            - name: https
+              containerPort: 2443
+              protocol: TCP
+          env:
+            - name: SRS_PLATFORM
+              value: "helm"
+            # For multiple instances expose different ports.
+            - name: RTMP_PORT
+              value: {{ .Values.service.rtmp | quote }}
+            - name: SRT_PORT
+              value: {{ .Values.service.srt | quote }}
+            - name: RTC_PORT
+              value: {{ .Values.service.rtc | quote }}
+            # Enable self-sign certificate by default.
+            - name: AUTO_SELF_SIGNED_CERTIFICATE
+              value: "on"
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+            - name: REDIS_HOST
+              value: {{ .Values.service.redisName }}
+            - name: SRS_HOST
+              value: {{ .Values.service.proxyName }}
+            - name: SRS_HTTP_STREAM_PORT
+              value: {{ .Values.service.srsHttp | quote}}
+          livenessProbe:
+            httpGet:
+              path: /terraform/v1/host/versions
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /terraform/v1/host/versions-
+              port: http
+          startupProbe:
+            httpGet:
+              path: /terraform/v1/host/versions
+              port: http
+            initialDelaySeconds: 2
+            failureThreshold: 3
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: data-storage
+      volumes:
+        - name: data-storage
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: oryx-pv-claim
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

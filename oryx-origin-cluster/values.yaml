@@ -1,0 +1,128 @@
+# Default values for oryx-origin-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  oryxRepository: zpcat/oryx
+  oryxPullPolicy: IfNotPresent
+  oryxTag: "5.16.dev2"
+  redisRepository: redis
+  redisPullPolicy: IfNotPresent
+  redisTag: "5.0"
+  srsRepository: zpcat/srs
+  srsPullPolicy: IfNotPresent
+  srsTag: "7-dev"
+  srsProxyRepository: zpcat/srs-proxy
+  srsProxyPullPolicy: IfNotPresent
+  srsProxyTag: "3"
+
+srsReplicas: 3
+
+candidate: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+autoscaling:
+  minReplicasProxy: 2
+  maxReplicasProxy: 4
+  targetCPUUtilizationPercentageProxy: 70
+  targetMemoryUtilizationPercentageProxy: 70
+
+persistence:
+  enabled: false
+  className: "standard"
+  redisStorage: 1Gi
+  oryxStorage: 9Gi
+  accessMode: ReadWriteOnce
+
+service:
+  redisName: "redis"
+  # redisType: ClusterIP
+  oryxName: "oryx"
+  # oryxType: ClusterIP
+  srsName: "srs"
+  proxyName: "srsproxy"
+  http: 80
+  https: 443
+  rtmp: 1935
+  srt: 10080
+  rtc: 8000
+  srsApi: 1985
+  srsHttp: 8080
+  proxyApi: 12025
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

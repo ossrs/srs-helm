@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.proxyName }}
+  labels: {{- include "oryx-origin-cluster.srsProxyLabels" . | nindent 4 }}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: rtmp
+      port: {{ .Values.service.rtmp }}
+      targetPort: 1935
+      protocol: TCP
+    - name: api
+      port: {{ .Values.service.srsApi }}
+      targetPort: 1985
+      protocol: TCP
+    - name: stream
+      port: {{ .Values.service.srsHttp }}
+      targetPort: 8080
+      protocol: TCP
+    - name: rtc-over-tcp
+      port: {{ .Values.service.rtc }}
+      targetPort: 8000
+      protocol: TCP
+    - name: proxy-api
+      port: {{ .Values.service.proxyApi }}
+      targetPort: 12025
+      protocol: TCP
+  selector:
+    {{- include "oryx-origin-cluster.srsProxySelectorLabels" . | nindent 4 }}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.proxyName }}-udp
+  labels: {{- include "oryx-origin-cluster.srsProxyLabels" . | nindent 4 }}
+spec:
+  type: LoadBalancer
+  ports:
+    - name: srt
+      port: {{ .Values.service.srt }}
+      targetPort: 10080
+      protocol: UDP
+    - name: rtc
+      port: {{ .Values.service.rtc }}
+      targetPort: 8000
+      protocol: UDP
+  selector:
+    {{- include "oryx-origin-cluster.srsProxySelectorLabels" . | nindent 4 }}

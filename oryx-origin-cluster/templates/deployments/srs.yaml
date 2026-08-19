@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "oryx-origin-cluster.srs-name" . }}
+  labels:
+    {{- include "oryx-origin-cluster.srsLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "oryx-origin-cluster.srsSelectorLabels" . | nindent 6 }}
+  serviceName: {{ .Values.service.srsName }}
+  replicas: {{ .Values.srsReplicas }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oryx-origin-cluster.srsLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      initContainers:
+        - name: "init-srs"
+          image: "{{ .Values.image.srsRepository }}:{{ .Values.image.srsTag }}"
+          imagePullPolicy: {{ .Values.image.srsPullPolicy }}
+          command:
+          - bash
+          - "-c"
+          - |-
+            set -ex
+            [[ $HOSTNAME =~ -([0-9]+)$ ]] || exit 1
+            ordinal=${BASH_REMATCH[1]}
+            # replace device_id
+            sed 's/device_id .*;/device_id origin-'$ordinal';/g' /data/srs/conf/srs.origin.conf > /data/srs/conf/srs.conf
+          volumeMounts:
+            - mountPath: "/data"
+              name: data-storage
+            - mountPath: "/data/srs/conf/srs.release.conf"
+              name: config-storage
+              subPath: srs.release.conf
+            - mountPath: "/data/srs/conf/srs.vhost.conf"
+              name: config-storage
+              subPath: srs.vhost.conf
+            - mountPath: "/data/srs/conf/srs.origin.conf"
+              name: config-storage
+              subPath: srs.origin.conf
+        - name: wait-proxy
+          image: "curlimages/curl:8.10.1"
+          imagePullPolicy: IfNotPresent
+          command:
+          - sh
+          - -c
+          - |-
+            until curl --output /dev/null --silent --head --fail {{ .Values.service.proxyName }}:{{ .Values.service.proxyApi }}/api/v1/versions
+            do
+              echo "srs not ready, continue after 3 seconds"
+              sleep 3
+            done
+      containers:
+        - name: "srs"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.srsRepository }}:{{ .Values.image.srsTag }}"
+          imagePullPolicy: {{ .Values.image.srsPullPolicy }}
+          command: ["./objs/srs", "-c", "/data/srs/conf/srs.conf"]
+          ports:
+            - name: rtmp
+              containerPort: 1935
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: api
+              containerPort: 1985
+              protocol: TCP
+            - name: srt
+              containerPort: 10080
+              protocol: UDP
+            - name: rtc
+              containerPort: 8000
+              protocol: UDP
+            - name: rtc-over-tcp
+              containerPort: 8000
+              protocol: TCP
+          env:
+            - name: SRS_PLATFORM
+              value: "helm"
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+            {{- if .Values.candidate }}
+            - name: SRS_RTC_SERVER_CANDIDATE
+              value: {{ .Values.candidate | quote }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            initialDelaySeconds: 2
+            failureThreshold: 3
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/data"
+              name: data-storage
+            - mountPath: "/data/srs/conf/srs.release.conf"
+              name: config-storage
+              subPath: srs.release.conf
+            - mountPath: "/data/srs/conf/srs.vhost.conf"
+              name: config-storage
+              subPath: srs.vhost.conf
+            - mountPath: "/data/srs/conf/srs.origin.conf"
+              name: config-storage
+              subPath: srs.origin.conf
+      volumes:
+        - name: data-storage
+          emptyDir: {}
+        - name: config-storage
+          configMap:
+            name: configs
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

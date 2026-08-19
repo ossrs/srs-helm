@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oryx-origin-cluster.redis-name" . }}
+  labels:
+    {{- include "oryx-origin-cluster.redisLabels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "oryx-origin-cluster.redisSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oryx-origin-cluster.redisLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "redis"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.redisRepository }}:{{ .Values.image.redisTag }}"
+          imagePullPolicy: {{ .Values.image.redisPullPolicy }}
+          command:
+          - bash
+          - -c
+          - |-
+            echo "Start Redis server, WORK_DIR:${WORK_DIR}"
+            REDIS_PARAMS="/data/redis/conf/redis.conf --daemonize no"
+            if [[ ! -z $REDIS_PASSWORD ]]; then REDIS_PARAMS="${REDIS_PARAMS} --requirepass $REDIS_PASSWORD"; fi
+            if [[ ! -z $REDIS_PORT ]]; then REDIS_PARAMS="${REDIS_PARAMS} --port $REDIS_PORT"; fi
+
+            mkdir -p /data/redis
+            REDIS_PARAMS="${REDIS_PARAMS} --dir /data/redis"
+            echo "Run redis-server $REDIS_PARAMS"
+            mkdir -p /var/run/redis &&
+            redis-server $REDIS_PARAMS
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          env:
+            - name: SRS_PLATFORM
+              value: "helm"
+          livenessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: "/data/redis"
+              name: redis-storage
+            - mountPath: "/data/redis/conf/redis.conf"
+              name: config-storage
+              subPath: redis.conf
+      volumes:
+        - name: redis-storage
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: redis-pv-claim
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: config-storage
+          configMap:
+            name: configs
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

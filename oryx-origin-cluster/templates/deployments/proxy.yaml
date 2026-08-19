@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oryx-origin-cluster.srs-proxy-name" . }}
+  labels:
+    {{- include "oryx-origin-cluster.srsProxyLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "oryx-origin-cluster.srsProxySelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "oryx-origin-cluster.srsProxyLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      initContainers:
+        - name: wait-redis
+          image: "{{ .Values.image.redisRepository }}:{{ .Values.image.redisTag }}"
+          imagePullPolicy: {{ .Values.image.redisPullPolicy }}
+          command:
+          - sh
+          - -c
+          - |-
+            until redis-cli -h  {{ .Values.service.redisName }} ping
+            do
+              echo "redis ping failed, continue after 3 seconds"
+              sleep 3
+            done
+      containers:
+        - name: "proxy"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.srsProxyRepository }}:{{ .Values.image.srsProxyTag }}"
+          imagePullPolicy: {{ .Values.image.srsProxyPullPolicy }}
+          command: ["./srs-proxy"]
+          ports:
+            - name: rtmp
+              containerPort: 1935
+              protocol: TCP
+            - name: http-api
+              containerPort: 1985
+              protocol: TCP
+            - name: http-stream
+              containerPort: 8080
+              protocol: TCP
+            - name: rtc
+              containerPort: 8000
+              protocol: UDP
+            - name: rtc-over-tcp
+              containerPort: 8000
+              protocol: TCP
+            - name: srt
+              containerPort: 10080
+              protocol: UDP
+            - name: proxy-api
+              containerPort: 12025
+              protocol: TCP
+          env:
+            - name: SRS_PLATFORM
+              value: "helm"
+            # For multiple instances expose different ports.
+            - name: RTMP_PORT
+              value: {{ .Values.service.rtmp | quote }}
+            - name: SRT_PORT
+              value: {{ .Values.service.srt | quote }}
+            - name: RTC_PORT
+              value: {{ .Values.service.rtc | quote }}
+            - name: PROXY_STATIC_FILES
+              value: "/proxy/static"
+            - name: PROXY_LOAD_BALANCER_TYPE
+              value: "redis"
+            - name: PROXY_REDIS_HOST
+              value: {{ .Values.service.redisName }}
+            - name: PROXY_REDIS_PORT
+              value: "6379"
+            - name: PROXY_RTMP_SERVER
+              value: "1935"
+            - name: PROXY_HTTP_SERVER
+              value: "8080"
+            - name: PROXY_HTTP_API
+              value: "1985"
+            - name: PROXY_WEBRTC_SERVER
+              value: "8000"
+            - name: PROXY_SRT_SERVER
+              value: "10080"
+            - name: PROXY_SYSTEM_API
+              value: "12025"
+            # Enable self-sign certificate by default.
+            - name: AUTO_SELF_SIGNED_CERTIFICATE
+              value: "on"
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+            - name: REDIS_HOST
+              value: {{ .Values.service.redisName }}
+            - name: SRS_HOST
+              value: {{ .Values.service.srsName }}

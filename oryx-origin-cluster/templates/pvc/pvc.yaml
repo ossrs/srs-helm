@@ -1,0 +1,66 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: oryx-pv
+  labels:
+    type: local
+spec:
+  storageClassName: {{ .Values.persistence.className }}
+  capacity:
+    storage: {{ .Values.persistence.oryxStorage }}
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  hostPath:
+    path: "/data/oryx"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: oryx-pv-claim
+spec:
+  storageClassName:
+  volumeName: oryx-pv
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.oryxStorage }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv
+  labels:
+    type: local
+spec:
+  storageClassName: {{ .Values.persistence.className }}
+  capacity:
+    storage: {{ .Values.persistence.redisStorage }}
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  hostPath:
+    path: "/data/redis"
+    type: DirectoryOrCreate
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pv-claim
+spec:
+  storageClassName:
+  volumeName: redis-pv
+  accessModes:
+    - {{ .Values.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.redisStorage }}
+
+{{- end }}

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.redisName }}
+  labels: {{- include "oryx-origin-cluster.redisLabels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  clusterIP: "None"
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    {{- include "oryx-origin-cluster.redisSelectorLabels" . | nindent 4 }}
