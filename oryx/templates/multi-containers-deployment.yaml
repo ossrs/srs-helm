@@ -1,0 +1,302 @@
+{{- if .Values.multiContainers.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "srs.fullname" . }}
+  labels:
+    {{- include "srs.labels" . | nindent 4 }}
+spec:
+  restartPolicy: Always
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "srs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "srs.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+        - name: srs-pv-storage
+          persistentVolumeClaim:
+            claimName: srs-pv-claim
+        - name: cache-volume
+          emptyDir: {}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "srs.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        # redis sidcar container
+        # TODO support external redis service, disable redis container if external one is defined.
+        - name: redis
+          volumeMounts:
+            - mountPath: "/data"
+              name: srs-pv-storage
+              {{- if .Values.persistence.subPath }}
+              subPath: {{ .Values.persistence.subPath | quote }}
+              {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          restartPolicy: Always
+          command:
+          - bash
+          - -c
+          - |-
+            ./auto/start_redis
+
+            stop_services() {
+              ./auto/before_stop
+              ./auto/stop_redis
+            }
+
+            handle_signals() {
+              echo "Platform: Signal $1 received. Cleaning up and exiting..."
+              stop_services
+              exit 0
+            }
+            trap 'handle_signals SIGTERM' SIGTERM
+            trap 'handle_signals SIGINT' SIGINT
+
+            while true; do
+              sleep 3
+              if [[ $(ps aux |grep redis |grep -q server || echo no) == no ]]; then
+                echo "Redis server stopped, exit."
+                break
+              fi
+            done
+
+            stop_services
+            exit 1
+          ports:
+            - name: redis
+              containerPort: 6379 # the redis default port
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        # srs sidecar container
+        - name: srs
+          volumeMounts:
+            - mountPath: "/data"
+              name: srs-pv-storage
+              {{- if .Values.persistence.subPath }}
+              subPath: {{ .Values.persistence.subPath | quote }}
+              {{- end }}
+            - mountPath: "/usr/local/oryx/platform/containers/objs/nginx/html"
+              name: cache-volume
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          restartPolicy: Always
+          command: # ["./auto/start_srs"]
+          - bash
+          - -c
+          - |-
+            ./auto/start_srs
+
+            stop_services() {
+              ./auto/stop_srs
+            }
+
+            handle_signals() {
+              echo "Signal $1 received. Cleaning up and exiting..."
+              stop_services
+              exit 0
+            }
+
+            trap 'handle_signals SIGTERM' SIGTERM
+            trap 'handle_signals SIGINT' SIGINT
+
+            while true; do
+              sleep 3
+              if [[ $(ps aux |grep srs |grep -q conf || echo no) == no ]]; then
+                echo "SRS server stopped, exit."
+                break
+              fi
+            done
+            stop_services
+            exit 1
+          ports:
+            - name: rtmp
+              containerPort: 1935
+              protocol: TCP
+            - name: api
+              containerPort: 1985
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: srt
+              containerPort: 10080
+              protocol: UDP
+            - name: rtc
+              containerPort: 8000
+              protocol: UDP
+          env:
+            # The general default config.
+            - name: SRS_PLATFORM
+              value: "helm"
+            # Overwrite the config by conf.
+            {{- range $key, $value := .Values.conf }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            # Overwrite the config by env.
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            # Overwrite by special item.
+            {{- if .Values.candidate }}
+            - name: SRS_RTC_SERVER_CANDIDATE
+              value: {{ .Values.candidate | quote }}
+            {{- end }}
+            # For Oryx, we resolve the ip in platform.
+            - name: SRS_RTC_SERVER_API_AS_CANDIDATES
+              value: "off"
+            # For Oryx, never detect network ip, because it runs in docker, and the ip is private.
+            - name: SRS_RTC_SERVER_USE_AUTO_DETECT_NETWORK_IP
+              value: "off"
+            # For Oryx, should always enable daemon.
+            - name: SRS_DAEMON
+              value: "on"
+            - name: SRS_HTTP_API_LISTEN
+              value: "1985"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /api/v1/versions
+              port: api
+            initialDelaySeconds: 2
+            failureThreshold: 3
+            periodSeconds: 10
+      containers:
+        # oryx main application container
+        - name: oryx
+          volumeMounts:
+            - mountPath: "/data"
+              name: srs-pv-storage
+              {{- if .Values.persistence.subPath }}
+              subPath: {{ .Values.persistence.subPath | quote }}
+              {{- end }}
+            - mountPath: "/usr/local/oryx/platform/containers/objs/nginx/html"
+              name: cache-volume
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: # ["./platform"]
+          - bash
+          - -c
+          - |-
+            echo "--- oryx container entry ---"
+            echo "start oryx platform"
+            ./platform &
+            if [[ $? -ne 0 ]]; then echo "Start platform failed"; exit 1; fi
+            handle_signals() {
+              echo "Platform: Signal $1 received. Cleaning up and exiting..."
+              exit 0
+            }
+            trap 'handle_signals SIGTERM' SIGTERM
+            trap 'handle_signals SIGINT' SIGINT
+
+            while true; do
+              sleep 3
+              
+              if [[ $(ps aux |grep platform |grep -v grep |grep -v usr |grep -q platform || echo no) == no ]]; then
+                  echo "Platform stopped, exit."
+                  break
+              fi
+            done
+            
+            exit 1
+          ports:
+            - name: http
+              containerPort: 2022
+              protocol: TCP
+            - name: https
+              containerPort: 2443
+              protocol: TCP
+          env:
+            # The general default config.
+            - name: SRS_PLATFORM
+              value: "helm"
+            # Overwrite the config by conf.
+            {{- range $key, $value := .Values.conf }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            # Overwrite the config by env.
+            {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+            # For multiple instances expose different ports.
+            - name: RTMP_PORT
+              value: {{ .Values.service.rtmp | quote }}
+            - name: SRT_PORT
+              value: {{ .Values.service.srt | quote }}
+            - name: RTC_PORT
+              value: {{ .Values.service.rtc | quote }}
+            # Enable self-sign certificate by default.
+            - name: AUTO_SELF_SIGNED_CERTIFICATE
+              value: "on"
+            # Enable dns name lookup.
+            - name: NAME_LOOKUP
+              value: "on"
+          livenessProbe:
+            httpGet:
+              path: /terraform/v1/host/versions
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /terraform/v1/host/versions
+              port: http
+          startupProbe:
+            httpGet:
+              path: /terraform/v1/host/versions
+              port: http
+            initialDelaySeconds: 2
+            failureThreshold: 3
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end -}}

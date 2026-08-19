@@ -14,7 +14,13 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+# simple set replicaCount more than one don't make sense, because oryx is stateful app.
 replicaCount: 1
+
+# muti containers mean the oryx platform, redis, and srs in its own container.
+multiContainers:
+  # Specifies whether deploy oryx as single container or multi containers in a pod.
+  enabled: false
 
 # The configuration for SRS can be overridden by environment variables.
 # See https://github.com/ossrs/srs/blob/develop/trunk/conf/full.conf
@@ -107,6 +113,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# simple open autoscaling don't make sense, because oryx is stateful app.
 autoscaling:
   enabled: false
   minReplicas: 1
