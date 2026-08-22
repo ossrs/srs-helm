@@ -119,3 +119,13 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+
+# Extra volumes for sidecars or persistence
+extraVolumes: []
+
+# Extra volume mounts for the main SRS container
+extraVolumeMounts: []
+
+# Extra containers (sidecars)
+extraContainers: []
